@@ -6,44 +6,38 @@ const restrict = require("../auth/authenticate-middleware")
 const secrets = require('../config/secrets');
 
 router.post('/register', async (req, res, next) => {
-  try {
-    const { username } = req.body;
-    const user = await Users.findBy({ username }).first()
 
-    if (user) {
-      return res.status(409).json({
-        message: "Username is already taken",
-      })
-    }
-    res.status(201).json(await Users.add(req.body))
-  } catch (err) {
-    next(err)
-  }
+  const user = req.body;
+
+  const hash = bcrypt.hashSync(user.password, 8);
+  user.password = hash;
+
+  Users.add(user)
+    .then(saved => {
+      res.status(201).json(saved);
+    })
+    .catch(error => {
+      res.status(500).json(error);
+    })
 });
 
-router.post('/login', async  (req, res, next) => {
-  const authError = {
-    message: "Invalid Credentials",
-  }
+router.post('/login', async (req, res, next) => {
+  let { username, password } = req.body;
 
-  try {
-    const user = await Users.findBy({ username: req.body.username }).first()
-    if (!user) {
-      return res.status(401).json(authError);
-    }
+  Users.findBy({ username })
+    .first()
+    .then(user => {
 
-    const tokenPayload = {
-      userId: user.id,
-      userRole: "admin",
-    }
-    res.cookie("token", jwt.sign(tokenPayload, process.env.JWT_secret))
-
-    res.json({
-      message: `Welcome ${user.username}!`,
+      if (user && bcrypt.compareSync(password, userpassword)) {
+        req.session.user = username;
+        res.status(200).json({ message: `Welcome ${user.username}!` });
+      } else {
+        res.status(401).json({ mesasge: 'invalid credentials' });
+      }
     })
-  } catch (err) {
-    next(err)
-  }
+    .catch(error => {
+      res.status(500).json(error);
+    });
 });
 
 module.exports = router;

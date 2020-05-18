@@ -1,38 +1,42 @@
 const jwt = require("jsonwebtoken");
 
-function restrict (role = "normal") {
-   
-    return async (req, res, next) => {
-      const authError = {
-        message: "Invalid credentials",
-      }
+// function restrict(role = "normal") {
 
-      try {
+//   return async (req, res, next) => {
+//     const authError = {
+//       message: "Invalid credentials",
+//     }
 
-        const token = req.cookies.token
+//     try {
 
-        if(!token) {
-          return res.status(401).json(authError);
-        }
+//       const token = req.cookies.token
 
-        jwt.verify(token, process.env.JWT_secret, (err, decodedPayload) => {
-          if(err || decodedPayload.userRole !== role) {
-            return res.status(401).json(authError);
-          }
+//       if (!token) {
+//         return res.status(401).json(authError);
+//       }
 
-          req.token = decodedPayload
+//       jwt.verify(token, process.env.JWT_secret, (err, decodedPayload) => {
+//         if (err || decodedPayload.userRole !== role) {
+//           return res.status(401).json(authError);
+//         }
 
-          next()
+//         req.token = decodedPayload
 
-        })
-      } catch(err) {
-        next(err)
-      }
+//         next()
 
-    }
-}
+//       })
+//     } catch (err) {
+//       next(err)
+//     }
+
+//   }
+// }
 
 module.exports = (req, res, next) => {
-  res.status(401).json({ you: 'shall not pass!' });
-  restrict;
+  if (req.session && req.session.user) {
+    next();
+  } else {
+    res.status(401).json({ you: 'shall not pass!' });
+  }
+  // restrict
 };

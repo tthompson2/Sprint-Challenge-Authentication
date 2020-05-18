@@ -2,7 +2,8 @@ const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Users = require("../jokes/jokes-model");
-// const restrict = require("../auth/authenticate-middleware")
+const restrict = require("../auth/authenticate-middleware")
+const secrets = require('../config/secrets');
 
 router.post('/register', async (req, res, next) => {
   try {
@@ -20,7 +21,7 @@ router.post('/register', async (req, res, next) => {
   }
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', async  (req, res, next) => {
   const authError = {
     message: "Invalid Credentials",
   }

@@ -3,7 +3,6 @@ const db = require("../database/dbconfig")
 
 async function add(user) {
 	// hash the password with a time complexity of 14
-	user.password = await bcrypt.hash(user.password, 14)
 
 	const [id] = await db("users").insert(user)
 	return findById(id)

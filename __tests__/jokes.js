@@ -16,14 +16,14 @@ describe("cabinet integration tests", () => {
         expect(res.statusCode).toBe(200);
         expect(res.type).toBe("application/json")
         expect(res.body).toHaveLength(4);
-        expect(res.body[0].name).toBe("Spacewar!")
+        expect(res.body[0].joke).toBe("Spacewar!")
     })
 
     it("GET /jokes/:id", async () => {
         const res = await supertest(server).get("/cabinets/0")
         expect(res.statusCode).toBe(200);
         expect(res.type).toBe("application/json");
-        expect(res.body.name).toBe("Spacewar!")
+        expect(res.body.joke).toBe("Spacewar!")
 
     })
 
@@ -32,10 +32,10 @@ describe("cabinet integration tests", () => {
         expect(res.statusCode).toBe(404)
     })
     it("POST /jokes", async () => {
-        const data = { name: "space invaders"}
+        const data = { joke: "space invaders"}
         const res = await supertest(server).post("/jokes").send(data)
         expect(res.statusCode).toBe(201);
         expect(res.type).toBe("application/json")
-        expect(res.body.name).toBe("space invaders")
+        expect(res.body.joke).toBe("space invaders")
     })
 })

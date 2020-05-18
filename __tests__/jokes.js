@@ -10,7 +10,7 @@ afterAll(async () => {
     await db.destroy()
 })
 
-describe("cabinet integration tests", () => {
+describe("jokes integration tests", () => {
     it("GET /jokes", async () => {
         const res = await supertest(server).get("/jokes");
         expect(res.statusCode).toBe(200);
@@ -37,5 +37,32 @@ describe("cabinet integration tests", () => {
         expect(res.statusCode).toBe(201);
         expect(res.type).toBe("application/json")
         expect(res.body.joke).toBe("space invaders")
+    })
+
+})
+
+describe("register endpoint", () => {
+    
+    it ("GET /register (not found)", async () => {
+        const res = await supertest(server).get("/register/50");
+        expect(res.statusCode).toBe(404)
+    })
+
+    it ("GET /register/:id (not found", async () => {
+        const res = await supertest(server).get("/register/");
+        expect(res.statusCode).toBe(404)
+    })
+
+})
+
+describe("login endpoint", () => {
+    it ("GET /login (not found)", async () => {
+        const res = await supertest(server).get("/login/50");
+        expect(res.statusCode).toBe(404)
+    })
+
+    it ("GET /login/:id (not found", async () => {
+        const res = await supertest(server).get("/login/");
+        expect(res.statusCode).toBe(404)
     })
 })

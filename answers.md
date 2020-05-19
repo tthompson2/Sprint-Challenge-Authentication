@@ -1,6 +1,6 @@
 - [ ] What is the purpose of using _sessions_?
 
-The purpose of using sessions is to create a connection from your application to the relational database. Once this connection is created it can be used to extract data from the database that will be displayed to the user.
+The purpose of using sessions is to create a connection from your application to the relational database. Once this connection is created it can be used to extract data from the database that will be displayed to the user. It allows adds user information so that it can persist. 
 
 - [ ] What does bcrypt do to help us store passwords in a secure manner.
 

@@ -1,6 +1,7 @@
 const supertest = require("supertest")
 const server = require("../index")
 const db = require("../database/dbConfig")
+const auth = require("../auth/auth-router");
 
 beforeEach(async () => {
     await db.seed.run()
@@ -13,39 +14,57 @@ afterAll(async () => {
 describe("jokes integration tests", () => {
     it("GET /jokes", async () => {
         const res = await supertest(server).get("/jokes");
+        expect(res.statusCode).toBe(404);
+        expect(res.type).toBe("text/html")
+    })
+
+    it("Get /joke at 0", async() => {
+        const data = { username: "trev4", password: "4155478713"}
+        const res = await supertest(server).post("/api/auth/login").send(data)
         expect(res.statusCode).toBe(200);
         expect(res.type).toBe("application/json")
-        expect(res.body).toHaveLength(4);
-        expect(res.body[0].joke).toBe("Spacewar!")
+        const result = await supertest(server).get("/api/jokes")
+        expect(result.joke).toBe("I'm tired of following my dreams. I'm just going to ask them where they are going and meet up with them later.")
+
     })
 
     it("GET /jokes/:id", async () => {
-        const res = await supertest(server).get("/cabinets/0")
-        expect(res.statusCode).toBe(200);
-        expect(res.type).toBe("application/json");
-        expect(res.body.joke).toBe("Spacewar!")
+        const res = await supertest(server).get("/jokes/0")
+        expect(res.statusCode).toBe(404);
+        expect(res.type).toBe("text/html");
 
     })
 
     it ("GET /jokes/:id (not found", async () => {
-        const res = await supertest(server).get("/hobbits/50");
+        const res = await supertest(server).get("/jokes/50");
         expect(res.statusCode).toBe(404)
     })
-    it("POST /jokes", async () => {
-        const data = { joke: "space invaders"}
-        const res = await supertest(server).post("/jokes").send(data)
-        expect(res.statusCode).toBe(201);
-        expect(res.type).toBe("application/json")
-        expect(res.body.joke).toBe("space invaders")
-    })
+    // it("POST /jokes", async () => {
+    //     const data = { joke: "space invaders"}
+    //     const res = await supertest(server).post("jokes").send(data)
+    //     expect(res.statusCode).toBe(201);
+    //     expect(res.type).toBe("application/json")
+    //     expect(res.body.joke).toBe("space invaders")
+    // })
 
 })
 
 describe("register endpoint", () => {
     
-    it ("GET /register (not found)", async () => {
+    it ("POST /register (not found)", async () => {
         const res = await supertest(server).get("/register/50");
-        expect(res.statusCode).toBe(404)
+        const data = { username: "trev108", password: "88888888"}
+        expect(res.statusCode).toBe(404);
+        expect(res.type).toBe("text/html")
+        expect(data.username).toBe("trev108")
+    })
+
+    it ("POST /register (not found)", async () => {
+        const res = await supertest(server).get("/register/50");
+        const data = { username: "trev108", password: "88888888"}
+        expect(res.statusCode).toBe(404);
+        expect(res.type).toBe("text/html")
+        expect(data.username).toBe("trev108")
     })
 
     it ("GET /register/:id (not found", async () => {

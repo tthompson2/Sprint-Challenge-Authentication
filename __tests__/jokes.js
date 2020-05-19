@@ -18,27 +18,17 @@ describe("jokes integration tests", () => {
         expect(res.type).toBe("text/html")
     })
 
-    it("Get /joke at 0", async() => {
-        const data = { username: "trev4", password: "4155478713"}
-        const res = await supertest(server).post("/api/auth/login").send(data)
-        expect(res.statusCode).toBe(200);
-        expect(res.type).toBe("application/json")
-        const result = await supertest(server).get("/api/jokes")
-        expect(result.joke).toBe("I'm tired of following my dreams. I'm just going to ask them where they are going and meet up with them later.")
+    // it("GET /jokes/:id", async () => {
+    //     const res = await supertest(server).get("/jokes/0")
+    //     expect(res.statusCode).toBe(404);
+    //     expect(res.type).toBe("text/html");
 
-    })
+    // })
 
-    it("GET /jokes/:id", async () => {
-        const res = await supertest(server).get("/jokes/0")
-        expect(res.statusCode).toBe(404);
-        expect(res.type).toBe("text/html");
-
-    })
-
-    it ("GET /jokes/:id (not found", async () => {
-        const res = await supertest(server).get("/jokes/50");
-        expect(res.statusCode).toBe(404)
-    })
+    // it("GET /jokes/:id (not found", async () => {
+    //     const res = await supertest(server).get("/jokes/50");
+    //     expect(res.statusCode).toBe(404)
+    // })
     // it("POST /jokes", async () => {
     //     const data = { joke: "space invaders"}
     //     const res = await supertest(server).post("jokes").send(data)
@@ -50,24 +40,27 @@ describe("jokes integration tests", () => {
 })
 
 describe("register endpoint", () => {
-    
-    it ("POST /register (not found)", async () => {
+
+    beforeEach(async () => {
+        await db("users").truncate();
+    })
+
+    it("POST /register add new user", async () => {
+
+        const data = { username: "trev108", password: "88888888" }
+        const res = await supertest(server).post("/api/auth/register").send(data)
+        expect(res.status).toBe(201)
+    })
+
+    it("POST /register (not found)", async () => {
         const res = await supertest(server).get("/register/50");
-        const data = { username: "trev108", password: "88888888"}
+        const data = { username: "trev108", password: "88888888" }
         expect(res.statusCode).toBe(404);
         expect(res.type).toBe("text/html")
         expect(data.username).toBe("trev108")
     })
 
-    it ("POST /register (not found)", async () => {
-        const res = await supertest(server).get("/register/50");
-        const data = { username: "trev108", password: "88888888"}
-        expect(res.statusCode).toBe(404);
-        expect(res.type).toBe("text/html")
-        expect(data.username).toBe("trev108")
-    })
-
-    it ("GET /register/:id (not found", async () => {
+    it("GET /register/:id (not found", async () => {
         const res = await supertest(server).get("/register/");
         expect(res.statusCode).toBe(404)
     })
@@ -75,13 +68,29 @@ describe("register endpoint", () => {
 })
 
 describe("login endpoint", () => {
-    it ("GET /login (not found)", async () => {
-        const res = await supertest(server).get("/login/50");
-        expect(res.statusCode).toBe(404)
+
+    beforeEach(async () => {
+        await db("users").truncate();
     })
 
-    it ("GET /login/:id (not found", async () => {
-        const res = await supertest(server).get("/login/");
-        expect(res.statusCode).toBe(404)
+    it("POST /login", async () => {
+        try {
+
+
+            const data = { username: "trev4", password: "4155478713" }
+            const register = await supertest(server).post("/api/auth/register").send(data)
+            const res = await supertest(server).post("/api/auth/login").send(data)
+            expect(res.statusCode).toBe(200);
+        } catch(err) {
+            throw(err)
+        }
+
+    })
+
+    it("POST /login failure", async () => {
+        const data = { username: "trev4", password: "41554787===13" }
+        const res = await supertest(server).post("/api/auth/login").send(data)
+        expect(res.statusCode).toBe(401);
+
     })
 })
